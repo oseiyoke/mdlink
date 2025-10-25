@@ -15,6 +15,7 @@ export interface Database {
           title: string
           content: string
           edit_key: string
+          slug: string
           created_at: string
           updated_at: string
           view_count: number
@@ -24,6 +25,7 @@ export interface Database {
           title?: string
           content?: string
           edit_key: string
+          slug: string
           created_at?: string
           updated_at?: string
           view_count?: number
@@ -33,6 +35,7 @@ export interface Database {
           title?: string
           content?: string
           edit_key?: string
+          slug?: string
           created_at?: string
           updated_at?: string
           view_count?: number

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button, Typography, Space, Card } from 'antd';
+import { Button, Typography, Space, Card, Modal, Input } from 'antd';
 import { FileTextOutlined, EditOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
@@ -10,9 +10,23 @@ const { Title, Paragraph } = Typography;
 export default function HomePage() {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [documentTitle, setDocumentTitle] = useState('');
+
+  const showModal = () => {
+    setDocumentTitle('');
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setDocumentTitle('');
+  };
 
   const handleCreateDocument = async () => {
     setCreating(true);
+    setIsModalOpen(false);
+    
     try {
       const response = await fetch('/api/documents', {
         method: 'POST',
@@ -20,7 +34,7 @@ export default function HomePage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: 'Untitled Document',
+          title: documentTitle.trim() || 'Untitled Document',
           content: '',
         }),
       });
@@ -30,7 +44,7 @@ export default function HomePage() {
       }
 
       const data = await response.json();
-      router.push(`/edit/${data.id}?key=${data.edit_key}`);
+      router.push(`/edit/${data.slug}?key=${data.edit_key}`);
     } catch (error) {
       console.error('Error creating document:', error);
       setCreating(false);
@@ -44,7 +58,7 @@ export default function HomePage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f5f5f5',
         padding: '24px',
       }}
     >
@@ -53,17 +67,11 @@ export default function HomePage() {
           maxWidth: 600,
           width: '100%',
           borderRadius: 12,
-          boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
         }}
       >
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <div style={{ textAlign: 'center' }}>
-            <FileTextOutlined
-              style={{ fontSize: 64, color: '#1890ff', marginBottom: 16 }}
-            />
-            <Title level={1} style={{ marginBottom: 8 }}>
-              MDLink
-            </Title>
             <Paragraph type="secondary" style={{ fontSize: 16 }}>
               A lightweight markdown editor for creating, editing, and sharing
               documents with real-time preview.
@@ -75,24 +83,43 @@ export default function HomePage() {
             size="large"
             icon={<EditOutlined />}
             block
-            onClick={handleCreateDocument}
+            onClick={showModal}
             loading={creating}
             style={{ height: 50, fontSize: 16 }}
           >
             Create New Document
           </Button>
 
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Paragraph type="secondary" style={{ fontSize: 14 }}>
-              <strong>Features:</strong>
-              <br />
-              Split view editor • Real-time preview • Share via links
-              <br />
-              Auto-save • No account required
-            </Paragraph>
-          </div>
+         
         </Space>
       </Card>
+
+      <Modal
+        title="Create New Document"
+        open={isModalOpen}
+        onOk={handleCreateDocument}
+        onCancel={handleCancel}
+        okText="Create"
+        cancelText="Cancel"
+        okButtonProps={{ disabled: creating }}
+      >
+        <div style={{ marginTop: 16, marginBottom: 16 }}>
+          <label style={{ display: 'block', marginBottom: 8 }}>
+            Document Name
+          </label>
+          <Input
+            placeholder="Enter document name (optional)"
+            value={documentTitle}
+            onChange={(e) => setDocumentTitle(e.target.value)}
+            onPressEnter={handleCreateDocument}
+            maxLength={100}
+            autoFocus
+          />
+          <div style={{ marginTop: 8, color: '#999', fontSize: 12 }}>
+            Leave blank to use &quot;Untitled Document&quot;
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeSanitize from 'rehype-sanitize';
 import { Typography } from 'antd';
 
@@ -26,7 +27,7 @@ export default function MarkdownPreview({ content }: MarkdownPreviewProps) {
   return (
     <div className="markdown-preview">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkBreaks]}
         rehypePlugins={[rehypeSanitize]}
       >
         {content}

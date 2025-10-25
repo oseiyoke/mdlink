@@ -4,14 +4,14 @@ import { validateEditKey } from '@/lib/utils/validation';
 
 interface RouteParams {
   params: {
-    id: string;
+    slug: string;
   };
 }
 
-// POST /api/documents/[id]/validate - Validate edit key
+// POST /api/documents/[slug]/validate - Validate edit key
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params;
+    const { slug } = params;
     const body = await request.json();
     const { edit_key } = body;
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data, error } = await supabaseAdmin
       .from('documents')
       .select('edit_key')
-      .eq('id', id)
+      .eq('slug', slug)
       .single();
 
     if (error || !data) {
@@ -39,3 +39,4 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ valid: false });
   }
 }
+

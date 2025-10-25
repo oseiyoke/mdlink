@@ -11,7 +11,7 @@ const { Content } = Layout;
 
 export default function ViewDocumentPage() {
   const params = useParams();
-  const documentId = params.id as string;
+  const documentSlug = params.slug as string;
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -21,7 +21,7 @@ export default function ViewDocumentPage() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/documents/${documentId}`);
+        const response = await fetch(`/api/documents/${documentSlug}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch document');
@@ -38,7 +38,7 @@ export default function ViewDocumentPage() {
     };
 
     fetchDocument();
-  }, [documentId]);
+  }, [documentSlug]);
 
   if (loading) {
     return (
@@ -52,7 +52,7 @@ export default function ViewDocumentPage() {
     <>
       <Layout style={{ height: '100vh' }}>
         <DocumentHeader
-          documentId={documentId}
+          documentSlug={documentSlug}
           title={title}
           onTitleChange={() => {}}
           onSave={async () => {}}
@@ -64,7 +64,7 @@ export default function ViewDocumentPage() {
 
         <Content style={{ overflow: 'auto', background: '#fff' }}>
           <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px' }}>
-            <Badge.Ribbon text="Read-only" color="blue">
+            <Badge.Ribbon text="Read-only" color="gray">
               <div
                 style={{
                   background: '#fff',
@@ -83,8 +83,9 @@ export default function ViewDocumentPage() {
       <ShareModal
         visible={shareModalVisible}
         onClose={() => setShareModalVisible(false)}
-        documentId={documentId}
+        documentSlug={documentSlug}
       />
     </>
   );
 }
+

@@ -11,20 +11,20 @@ import { Database } from '@/types/database';
 
 interface RouteParams {
   params: {
-    id: string;
+    slug: string;
   };
 }
 
-// GET /api/documents/[id] - Fetch document (public, excludes edit_key)
+// GET /api/documents/[slug] - Fetch document (public, excludes edit_key)
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params;
+    const { slug } = params;
 
     // Fetch document from database
     const { data, error } = await supabaseAdmin
       .from('documents')
-      .select('id, title, content, created_at, updated_at, view_count')
-      .eq('id', id)
+      .select('id, slug, title, content, created_at, updated_at, view_count')
+      .eq('slug', slug)
       .single();
 
     if (error || !data) {
@@ -48,14 +48,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// PUT /api/documents/[id] - Update document (requires valid edit_key)
+// PUT /api/documents/[slug] - Update document (requires valid edit_key)
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params;
+    const { slug } = params;
 
     // Rate limiting: 60 updates per minute
     const clientIp = getClientIp(request);
-    const isRateLimited = rateLimiter.check(`${clientIp}:${id}`, 60, 60 * 1000);
+    const isRateLimited = rateLimiter.check(`${clientIp}:${slug}`, 60, 60 * 1000);
 
     if (isRateLimited) {
       return NextResponse.json(
@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { data: document, error: fetchError } = await supabaseAdmin
       .from('documents')
       .select('edit_key')
-      .eq('id', id)
+      .eq('slug', slug)
       .single();
 
     if (fetchError || !document) {
@@ -130,8 +130,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { data, error } = await supabaseAdmin
       .from('documents')
       .update(updates as any)
-      .eq('id', id)
-      .select('id, title, content, updated_at')
+      .eq('slug', slug)
+      .select('id, slug, title, content, updated_at')
       .single();
 
     if (error) {
@@ -151,3 +151,4 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     );
   }
 }
+

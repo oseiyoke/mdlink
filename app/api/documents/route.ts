@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { generateEditKey } from '@/lib/utils/generateEditKey';
+import { generateSlug } from '@/lib/utils/generateSlug';
 import { rateLimiter } from '@/lib/utils/rateLimiter';
 import { validateContentSize, validateTitle, getClientIp } from '@/lib/utils/validation';
 
@@ -38,8 +39,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate edit key
+    // Generate edit key and slug
     const editKey = generateEditKey();
+    const slug = generateSlug(title);
 
     // Create document in database
     const { data, error } = await supabaseAdmin
@@ -48,8 +50,9 @@ export async function POST(request: NextRequest) {
         title,
         content,
         edit_key: editKey,
+        slug,
       })
-      .select('id')
+      .select('id, slug')
       .single();
 
     if (error) {
@@ -62,6 +65,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       id: data.id,
+      slug: data.slug,
       edit_key: editKey,
     });
   } catch (error) {

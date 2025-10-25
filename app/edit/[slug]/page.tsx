@@ -15,7 +15,7 @@ export default function EditDocumentPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const documentId = params.id as string;
+  const documentSlug = params.slug as string;
   const editKey = searchParams.get('key');
 
   const [title, setTitle] = useState('Untitled Document');
@@ -35,12 +35,12 @@ export default function EditDocumentPage() {
     const validateEditKey = async () => {
       if (!editKey) {
         message.warning('No edit key provided. Redirecting to view mode...');
-        setTimeout(() => router.push(`/view/${documentId}`), 2000);
+        setTimeout(() => router.push(`/view/${documentSlug}`), 2000);
         return;
       }
 
       try {
-        const response = await fetch(`/api/documents/${documentId}/validate`, {
+        const response = await fetch(`/api/documents/${documentSlug}/validate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ edit_key: editKey }),
@@ -52,16 +52,16 @@ export default function EditDocumentPage() {
           setIsValidEditKey(true);
         } else {
           message.error('Invalid edit key. Redirecting to view mode...');
-          setTimeout(() => router.push(`/view/${documentId}`), 2000);
+          setTimeout(() => router.push(`/view/${documentSlug}`), 2000);
         }
       } catch (error) {
         message.error('Failed to validate edit key');
-        setTimeout(() => router.push(`/view/${documentId}`), 2000);
+        setTimeout(() => router.push(`/view/${documentSlug}`), 2000);
       }
     };
 
     validateEditKey();
-  }, [documentId, editKey, router]);
+  }, [documentSlug, editKey, router]);
 
   // Fetch document
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function EditDocumentPage() {
 
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/documents/${documentId}`);
+        const response = await fetch(`/api/documents/${documentSlug}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch document');
@@ -88,7 +88,7 @@ export default function EditDocumentPage() {
     };
 
     fetchDocument();
-  }, [documentId, isValidEditKey]);
+  }, [documentSlug, isValidEditKey]);
 
   const handleSave = useCallback(async () => {
     if (!editKey) return;
@@ -96,7 +96,7 @@ export default function EditDocumentPage() {
     setIsSaving(true);
 
     try {
-      const response = await fetch(`/api/documents/${documentId}`, {
+      const response = await fetch(`/api/documents/${documentSlug}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -118,7 +118,7 @@ export default function EditDocumentPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [editKey, documentId, title, content]);
+  }, [editKey, documentSlug, title, content]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -163,7 +163,7 @@ export default function EditDocumentPage() {
     <>
       <Layout style={{ height: '100vh' }}>
         <DocumentHeader
-          documentId={documentId}
+          documentSlug={documentSlug}
           title={title}
           onTitleChange={handleTitleChange}
           onSave={handleSave}
@@ -173,7 +173,7 @@ export default function EditDocumentPage() {
         />
 
         <Layout style={{ height: 'calc(100vh - 65px)' }}>
-          <Content style={{ height: '100%', overflow: 'hidden' }}>
+          <Content style={{ height: '100%', overflow: 'auto' }}>
             <MarkdownEditor value={content} onChange={handleContentChange} />
           </Content>
 
@@ -193,9 +193,10 @@ export default function EditDocumentPage() {
       <ShareModal
         visible={shareModalVisible}
         onClose={() => setShareModalVisible(false)}
-        documentId={documentId}
+        documentSlug={documentSlug}
         editKey={editKey || undefined}
       />
     </>
   );
 }
+

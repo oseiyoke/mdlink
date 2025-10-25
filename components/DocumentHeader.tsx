@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 const { Text } = Typography;
 
 interface DocumentHeaderProps {
-  documentId: string;
+  documentSlug: string;
   title: string;
   onTitleChange: (title: string) => void;
   onSave: () => Promise<void>;
@@ -19,7 +19,7 @@ interface DocumentHeaderProps {
 }
 
 export default function DocumentHeader({
-  documentId,
+  documentSlug,
   title,
   onTitleChange,
   onSave,

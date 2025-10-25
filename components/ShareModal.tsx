@@ -9,22 +9,22 @@ const { Text, Paragraph } = Typography;
 interface ShareModalProps {
   visible: boolean;
   onClose: () => void;
-  documentId: string;
+  documentSlug: string;
   editKey?: string;
 }
 
 export default function ShareModal({
   visible,
   onClose,
-  documentId,
+  documentSlug,
   editKey,
 }: ShareModalProps) {
   const baseUrl =
     typeof window !== 'undefined' ? window.location.origin : '';
 
-  const viewLink = `${baseUrl}/view/${documentId}`;
+  const viewLink = `${baseUrl}/view/${documentSlug}`;
   const editLink = editKey
-    ? `${baseUrl}/edit/${documentId}?key=${editKey}`
+    ? `${baseUrl}/edit/${documentSlug}?key=${editKey}`
     : '';
 
   const copyToClipboard = async (text: string, label: string) => {
@@ -48,7 +48,7 @@ export default function ShareModal({
         {/* View Link */}
         <div>
           <div style={{ marginBottom: 8 }}>
-            <EyeOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+            <EyeOutlined style={{ marginRight: 8, color: '#5a5a5a' }} />
             <Text strong>View-only Link</Text>
           </div>
           <Paragraph type="secondary" style={{ fontSize: 12, marginBottom: 8 }}>
@@ -74,7 +74,7 @@ export default function ShareModal({
         {editLink && (
           <div>
             <div style={{ marginBottom: 8 }}>
-              <EditOutlined style={{ marginRight: 8, color: '#52c41a' }} />
+              <EditOutlined style={{ marginRight: 8, color: '#5a5a5a' }} />
               <Text strong>Edit Link</Text>
             </div>
             <Paragraph type="secondary" style={{ fontSize: 12, marginBottom: 8 }}>
@@ -90,7 +90,6 @@ export default function ShareModal({
                 type="primary"
                 icon={<CopyOutlined />}
                 onClick={() => copyToClipboard(editLink, 'Edit link')}
-                style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
               >
                 Copy
               </Button>

@@ -12,7 +12,9 @@ export default function StyledComponentsRegistry({
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#1890ff',
+          colorPrimary: '#3f3f3f',
+          colorLink: '#4a4a4a',
+          colorInfo: '#5a5a5a',
           borderRadius: 6,
         },
       }}
